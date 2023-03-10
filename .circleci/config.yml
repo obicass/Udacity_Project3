@@ -119,174 +119,174 @@ jobs:
           paths: [backend/node_modules]
           key: backend-deps-{{ checksum "backend/package-lock.json" }}
 
-  # test-frontend:
-  #   docker:
-  #     - image: cimg/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - frontend-deps-{{ checksum "frontend/package-lock.json" }}
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           cd frontend
-  #           npm install
-  #     - run:
-  #         name: Run frontend unit tests
-  #         command: |
-  #           cd frontend
-  #           npm run test
-  # test-backend:
-  #   docker:
-  #     - image: cimg/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - backend-deps-{{ checksum "backend/package-lock.json" }}
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           cd backend
-  #           npm install
-  #     - run:
-  #         name: Run backend unit tests
-  #         command: |
-  #           cd backend
-  #           npm run test
-  # scan-frontend:
-  #   docker:
-  #     - image: cimg/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - frontend-deps-{{ checksum "frontend/package-lock.json" }}
-  #     - run:
-  #         name: Install all dependencies
-  #         command: |
-  #           cd frontend
-  #           npm install
-  #     - run:
-  #         name: Scan frontend packages
-  #         command: |
-  #           cd frontend
-  #           npm audit fix --force --audit-level=critical
-  #           npm audit fix --force --audit-level=critical
-  #           npm audit --audit-level=critical
-  # scan-backend:
-  #   docker:
-  #     - image: cimg/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - backend-deps-{{ checksum "backend/package-lock.json" }}
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           cd backend
-  #           npm install
-  #     - run:
-  #         name: Scan backend packages
-  #         command: |
-  #           cd backend
-  #           npm audit fix --force --audit-level=critical
-  #           npm audit fix --force --audit-level=critical
-  #           npm audit --audit-level=critical
+  test-frontend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install
+      - run:
+          name: Run frontend unit tests
+          command: |
+            cd frontend
+            npm run test
+  test-backend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - backend-deps-{{ checksum "backend/package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
+          name: Run backend unit tests
+          command: |
+            cd backend
+            npm run test
+  scan-frontend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+      - run:
+          name: Install all dependencies
+          command: |
+            cd frontend
+            npm install
+      - run:
+          name: Scan frontend packages
+          command: |
+            cd frontend
+            npm audit fix --force --audit-level=critical
+            npm audit fix --force --audit-level=critical
+            npm audit --audit-level=critical
+  scan-backend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - backend-deps-{{ checksum "backend/package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
+          name: Scan backend packages
+          command: |
+            cd backend
+            npm audit fix --force --audit-level=critical
+            npm audit fix --force --audit-level=critical
+            npm audit --audit-level=critical
             
-  # deploy-infrastructure:
-  #   docker:
-  #     - image: cimg/python:3.10
-  #   steps:
-  #     - checkout
-  #     - install_awscli
-  #     - run:
-  #         name: Ensure frontend infrastructure exist
-  #         command: |
-  #           aws cloudformation deploy \
-  #           --template-file .circleci/files/frontend.yml \
-  #           --tags project=udapeople \
-  #           --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #           --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-  #     - run:
-  #         name: Ensure backend infrastructure exist
-  #         command: |
-  #           aws cloudformation deploy \
-  #           --template-file .circleci/files/backend.yml \
-  #           --tags project=udapeople \
-  #           --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #           --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-  #     - run:
-  #         name: Add back-end ip to ansible inventory
-  #         command: |
-  #           BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
-  #             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text)
-  #           echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
-  #           cat .circleci/ansible/inventory.txt
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - project/.circleci/ansible/inventory.txt
+  deploy-infrastructure:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - install_awscli
+      - run:
+          name: Ensure frontend infrastructure exist
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/frontend.yml \
+            --tags project=udapeople \
+            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Ensure backend infrastructure exist
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/backend.yml \
+            --tags project=udapeople \
+            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image: cimg/base:stable
-  #   steps:
-  #     - checkout
-  #     - install_awscli
-  #     - install_ansible
-  #     - add_ssh_keys:
-  #         fingerprints: ["20:64:07:65:3d:b6:1b:f7:47:16:c4:ad:15:76:4e:29"]
-  #     - attach_workspace:
-  #         at: ~/
-  #     # - run:
-  #     #     name: Install dependencies
-  #     #     command: |
-  #     #       apk add tar gzip ansible nodejs
-  #     #       pip install --upgrade pip
-  #     #       pip install awscli
+  configure-infrastructure:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_ansible
+      - add_ssh_keys:
+          fingerprints: ["20:64:07:65:3d:b6:1b:f7:47:16:c4:ad:15:76:4e:29"]
+      - attach_workspace:
+          at: ~/
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       apk add tar gzip ansible nodejs
+      #       pip install --upgrade pip
+      #       pip install awscli
 
-  #     - run:
-  #         name: Configure Server Ansible play
-  #         command: |
-  #           cd .circleci/ansible
-  #           cat inventory.txt
+      - run:
+          name: Configure Server Ansible play
+          command: |
+            cd .circleci/ansible
+            cat inventory.txt
             
-  #           ansible-playbook -i inventory.txt configure-server.yml
-  #     - destroy-environment
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment
 
-  # run-migrations:
-  #   docker:
-  #     - image: cimg/python:3.10
-  #   steps:
-  #     - checkout
-  #     - install_awscli
-  #     - install_nodejs
-  #     - restore_cache:
-  #         keys: [backend-build]
-  #     - run:
-  #         name: Run migrations
-  #         command: |
-  #           cd backend
-  #           npm install
-  #           npm run migrations > migrations_dump.txt
-  #           cat migrations_dump.txt
-  #     - run:
-  #         name: Send migration status to kvdb.io
-  #         command: |
-  #           if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-  #           then
-  #             curl https://kvdb.io/5Zt9DW7dNBA6YzJD3fcMf6/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-  #           else
-  #             echo "Migrations failure"
-  #           fi
-  #   # Here's where you will add some code to rollback on failure
-  #     - destroy-environment
-  #     - revert-migrations      
+  run-migrations:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - install_awscli
+      - install_nodejs
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm install
+            npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
+      - run:
+          name: Send migration status to kvdb.io
+          command: |
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              curl https://kvdb.io/5Zt9DW7dNBA6YzJD3fcMf6/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            else
+              echo "Migrations failure"
+            fi
+    # Here's where you will add some code to rollback on failure
+      - destroy-environment
+      - revert-migrations      
 
   # deploy-frontend:
   #   docker:
@@ -472,19 +472,19 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master]
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [Master]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
       # - run-migrations:
