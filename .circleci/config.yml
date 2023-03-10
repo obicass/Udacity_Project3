@@ -288,48 +288,48 @@ jobs:
       - destroy-environment
       - revert-migrations      
 
-  # deploy-frontend:
-  #   docker:
-  #     - image: cimg/python:3.10 
-  #   steps:
-  #     - checkout
-  #     - install_awscli
-  #     - install_nodejs
-  #     - restore_cache:
-  #         keys: [frontend-build]
-  #     # - add_ssh_keys:
-  #     #     fingerprints:
-  #     #       - "27:3f:bb:6f:4b:56:c7:18:a3:72:ec:1f:b5:7c:ac:22"
-  #     # - attach_workspace:
-  #     #     at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           cd frontend
-  #           npm install
-  #           # apk add --update --no-cache tar gzip nodejs npm aws-cli
+  deploy-frontend:
+    docker:
+      - image: cimg/python:3.10 
+    steps:
+      - checkout
+      - install_awscli
+      - install_nodejs
+      - restore_cache:
+          keys: [frontend-build]
+      # - add_ssh_keys:
+      #     fingerprints:
+      #       - "27:3f:bb:6f:4b:56:c7:18:a3:72:ec:1f:b5:7c:ac:22"
+      # - attach_workspace:
+      #     at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install
+            # apk add --update --no-cache tar gzip nodejs npm aws-cli
             
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
-  #             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text)
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
 
-  #           echo "API_URL=http://${BACKEND_PUBLIC_IP}:3030" >> frontend/.env
-  #           cat frontend/.env
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           cd frontend
-  #           npm run build
-  #           # tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-  #           aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            echo "API_URL=http://${BACKEND_PUBLIC_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm run build
+            # tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
-  #     # Here's where you will add some code to rollback on failure      
-  #     - destroy-environment
-  #     - revert-migrations
+      # Here's where you will add some code to rollback on failure      
+      - destroy-environment
+      - revert-migrations
 
   # deploy-backend:
   #   docker:
@@ -489,8 +489,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
       # - deploy-backend:
       #     requires: [run-migrations]
       # - smoke-test:
@@ -500,4 +500,5 @@ workflows:
       # - cleanup:
       #     requires: [cloudfront-update]
       
+    
     
