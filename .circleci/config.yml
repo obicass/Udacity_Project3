@@ -137,44 +137,44 @@ jobs:
           command: |
             cd frontend
             npm run test
-  # test-backend:
-  #   docker:
-  #     - image: cimg/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - backend-deps-{{ checksum "backend/package-lock.json" }}
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           cd backend
-  #           npm install
-  #     - run:
-  #         name: Run backend unit tests
-  #         command: |
-  #           cd backend
-  #           npm run test
-  # scan-frontend:
-  #   docker:
-  #     - image: cimg/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #           - frontend-deps-{{ checksum "frontend/package-lock.json" }}
-  #     - run:
-  #         name: Install all dependencies
-  #         command: |
-  #           cd frontend
-  #           npm install
-  #     - run:
-  #         name: Scan frontend packages
-  #         command: |
-  #           cd frontend
-  #           npm audit fix --force --audit-level=critical
-  #           npm audit fix --force --audit-level=critical
-  #           npm audit --audit-level=critical
+  test-backend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - backend-deps-{{ checksum "backend/package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
+          name: Run backend unit tests
+          command: |
+            cd backend
+            npm run test
+  scan-frontend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+      - run:
+          name: Install all dependencies
+          command: |
+            cd frontend
+            npm install
+      - run:
+          name: Scan frontend packages
+          command: |
+            cd frontend
+            npm audit fix --force --audit-level=critical
+            npm audit fix --force --audit-level=critical
+            npm audit --audit-level=critical
   # scan-backend:
   #   docker:
   #     - image: cimg/node:13.8.0
@@ -473,10 +473,10 @@ workflows:
       - build-backend
       - test-frontend:
           requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      - scan-backend:
+      - test-backend:
           requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
       # - deploy-infrastructure:
