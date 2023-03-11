@@ -1,5 +1,0 @@
-url01
-https://github.com/tunde-ade/cdond-c3-projects
-
-url02
-http://udapeople-09809b3.s3-website-us-east-1.amazonaws.com
